@@ -1,0 +1,184 @@
+import javax.swing.*;
+import java.awt.*;
+import java.awt.event.*;
+import java.lang.Math;
+
+public class ScientificCalculator extends JFrame implements ActionListener {
+
+    // TextField to display the full expression and result
+    private JTextField textField;
+
+    // Arrays to store buttons
+    private JButton[] numberButtons = new JButton[10];
+    private JButton[] functionButtons = new JButton[9];
+
+    private JButton addButton, subButton, mulButton, divButton, eqButton, clrButton, delButton, decButton, negButton;
+    private JButton sqrtButton, expButton, logButton, sinButton, cosButton, tanButton, sinInverseButton, cosInverseButton, tanInverseButton;
+
+    private String operator;
+    private double num1, num2, result;
+
+    public ScientificCalculator() {
+        // Setting up the JFrame
+        setTitle("Scientific Calculator");
+        setSize(400, 600);
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setLayout(new BorderLayout());
+
+        // TextField to display full expression and results
+        textField = new JTextField();
+        textField.setFont(new Font("Arial", Font.PLAIN, 24));
+        textField.setEditable(false);
+        add(textField, BorderLayout.NORTH);
+
+        // Panel to hold buttons
+        JPanel buttonPanel = new JPanel();
+        buttonPanel.setLayout(new GridLayout(6, 4, 10, 10)); // 6 rows, 4 columns, 10px gap
+
+        // Create number buttons (0-9)
+        for (int i = 0; i < 10; i++) {
+            numberButtons[i] = new JButton(String.valueOf(i));
+            numberButtons[i].setFont(new Font("Arial", Font.PLAIN, 20));
+            numberButtons[i].addActionListener(this);
+            buttonPanel.add(numberButtons[i]);
+        }
+
+        // Create function buttons
+        addButton = createFunctionButton("+");
+        subButton = createFunctionButton("-");
+        mulButton = createFunctionButton("*");
+        divButton = createFunctionButton("/");
+        eqButton = createFunctionButton("=");
+        clrButton = createFunctionButton("C");
+        delButton = createFunctionButton("Del");
+        decButton = createFunctionButton(".");
+        negButton = createFunctionButton("(-)");
+
+        sqrtButton = createFunctionButton("√");
+        expButton = createFunctionButton("x^y");
+        logButton = createFunctionButton("log");
+        sinButton = createFunctionButton("sin");
+        cosButton = createFunctionButton("cos");
+        tanButton = createFunctionButton("tan");
+        sinInverseButton = createFunctionButton("sin⁻¹");
+        cosInverseButton = createFunctionButton("cos⁻¹");
+        tanInverseButton = createFunctionButton("tan⁻¹");
+
+        // Adding function buttons to the panel
+        buttonPanel.add(addButton);
+        buttonPanel.add(subButton);
+        buttonPanel.add(mulButton);
+        buttonPanel.add(divButton);
+        buttonPanel.add(sqrtButton);
+        buttonPanel.add(expButton);
+        buttonPanel.add(logButton);
+        buttonPanel.add(eqButton);
+        buttonPanel.add(clrButton);
+        buttonPanel.add(delButton);
+        buttonPanel.add(negButton);
+        buttonPanel.add(decButton);
+        buttonPanel.add(sinButton);
+        buttonPanel.add(cosButton);
+        buttonPanel.add(tanButton);
+        buttonPanel.add(sinInverseButton);
+        buttonPanel.add(cosInverseButton);
+        buttonPanel.add(tanInverseButton);
+
+        // Add button panel to frame
+        add(buttonPanel, BorderLayout.CENTER);
+
+        setVisible(true);
+    }
+
+    // Method to create function buttons
+    private JButton createFunctionButton(String text) {
+        JButton button = new JButton(text);
+        button.setFont(new Font("Arial", Font.PLAIN, 20));
+        button.addActionListener(this);
+        return button;
+    }
+
+    // Handle button actions
+    @Override
+    public void actionPerformed(ActionEvent e) {
+        String command = e.getActionCommand();
+
+        // If the button clicked is a number button (0-9)
+        if (command.charAt(0) >= '0' && command.charAt(0) <= '9') {
+            textField.setText(textField.getText() + command); // Append the number
+        }
+        // If the button clicked is the "C" button (clear)
+        else if (command.charAt(0) == 'C') {
+            textField.setText(""); // Clear the input
+            num1 = num2 = result = 0; // Reset variables
+        }
+        // If the button clicked is the "Del" button (delete last character)
+        else if (command.charAt(0) == 'D') {
+            String currentText = textField.getText();
+            if (currentText.length() > 0) {
+                textField.setText(currentText.substring(0, currentText.length() - 1)); // Remove last character
+            }
+        }
+        // If the button clicked is "=" (equals)
+        else if (command.charAt(0) == '=') {
+            // Perform the calculation
+            num2 = Double.parseDouble(textField.getText().split("[+\\-*/^√logsin⁻¹cos⁻¹tan⁻¹]", 2)[1]);
+            switch (operator) {
+                case "+":
+                    result = num1 + num2;
+                    break;
+                case "-":
+                    result = num1 - num2;
+                    break;
+                case "*":
+                    result = num1 * num2;
+                    break;
+                case "/":
+                    result = num1 / num2;
+                    break;
+                case "x^y":
+                    result = Math.pow(num1, num2);
+                    break;
+                case "√":
+                    result = Math.sqrt(num1);
+                    break;
+                case "log":
+                    result = Math.log10(num1);
+                    break;
+                case "sin":
+                    result = Math.sin(Math.toRadians(num1));
+                    break;
+                case "cos":
+                    result = Math.cos(Math.toRadians(num1));
+                    break;
+                case "tan":
+                    result = Math.tan(Math.toRadians(num1));
+                    break;
+                case "sin⁻¹":
+                    result = Math.asin(num1);
+                    break;
+                case "cos⁻¹":
+                    result = Math.acos(num1);
+                    break;
+                case "tan⁻¹":
+                    result = Math.atan(num1);
+                    break;
+            }
+            textField.setText(textField.getText() + " = " + result); // Display expression + result
+            num1 = result; // Store result for future operations
+            operator = ""; // Reset operator
+        }
+        // For operators (+, -, *, /, etc.)
+        else {
+            if (!command.equals("=")) {
+                operator = command; // Store the operator
+                num1 = Double.parseDouble(textField.getText()); // Store the first operand
+                textField.setText(textField.getText() + " " + operator + " "); // Append operator to the text
+            }
+        }
+    }
+
+    public static void main(String[] args) {
+        new ScientificCalculator();
+    }
+}
